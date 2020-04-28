@@ -1,0 +1,12 @@
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+# dependencies
+/node_modules
+/build
+/public/pyserver_dist
+__pycache__
+build
+dist
+systemlog
+/public/pyserver_dist
+venv
