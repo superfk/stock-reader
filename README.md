@@ -1,11 +1,11 @@
-#Purpose
+# Purpose
 This project uses React, Eelctron and Python to review stock data.
 
-#Install
+# Install
 npm install
 
-#Run
+# Run
 npm start
 
-#Build
+# Build
 npm run build
