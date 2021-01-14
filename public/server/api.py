@@ -63,7 +63,8 @@ class PyServerAPI(object):
         msg = {'cmd': cmd, 'data': data}
         filter_cmd = ['update_cur_status', 'pong']
         if cmd not in filter_cmd:
-            self.lg.debug('server sent msg: {}'.format(msg))
+            # self.lg.debug('server sent msg: {}'.format(msg))
+            pass
 
         try:
             await websocket.send(json.dumps(msg))

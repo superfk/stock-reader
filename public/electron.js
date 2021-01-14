@@ -31,7 +31,7 @@ function connect() {
   ws.on('message',(message)=>{
     try{
       msg = tools.parseServerMessage(message);
-      console.log(msg)
+      // console.log(msg)
       let cmd = msg.cmd;
       let data = msg.data;
       switch(cmd) {

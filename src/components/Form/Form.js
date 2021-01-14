@@ -7,7 +7,7 @@ const form = props => {
         <form className={classes.FormContent}>
             <div>
                 <label >Stock:</label>
-                <input type='text' name='stockNo' value={props.stock} onChange={props.changed} placeholder='2317'></input>
+                <input type='text' name='stockNo' value={props.stock} onChange={props.changed} ></input>
             </div>
             <div>
                 <label>Date From:</label>

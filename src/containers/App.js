@@ -1,37 +1,10 @@
 import React, { Component } from 'react';
 import Form from '../components/Form/Form';
-import LineChart from '../components/LineChart/LineChart'
+import PlotlyChart from '../components/PlotChart/PlotlyChart';
 import classes from './App.module.css';
 
 const electron = window.require('electron');
-const ipcRenderer  = electron.ipcRenderer;
-
-// const data = {
-//   labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
-//   datasets: [
-//     {
-//       label: 'My First dataset',
-//       fill: false,
-//       lineTension: 0.1,
-//       backgroundColor: 'rgba(75,192,192,0.4)',
-//       borderColor: 'rgba(75,192,192,1)',
-//       borderCapStyle: 'butt',
-//       borderDash: [],
-//       borderDashOffset: 0.0,
-//       borderJoinStyle: 'miter',
-//       pointBorderColor: 'rgba(75,192,192,1)',
-//       pointBackgroundColor: '#fff',
-//       pointBorderWidth: 1,
-//       pointHoverRadius: 5,
-//       pointHoverBackgroundColor: 'rgba(75,192,192,1)',
-//       pointHoverBorderColor: 'rgba(220,220,220,1)',
-//       pointHoverBorderWidth: 2,
-//       pointRadius: 1,
-//       pointHitRadius: 10,
-//       data: [65, 59, 80, 81, 56, 55, 40]
-//     }
-//   ]
-// };
+const ipcRenderer = electron.ipcRenderer;
 
 
 class App extends Component {
@@ -44,14 +17,15 @@ class App extends Component {
       to: '2020-12-31'
     },
 
-    stockData: {data:[{time:'', value:''}], title:'stock'}
+    stockData: { data: [{ time: '', value: '' }], title: 'stock' },
+    data: [],
 
   };
 
-  formChangeHandler = (event)=>{
+  formChangeHandler = (event) => {
     let targetName = event.target.name;
     let targetValue = event.target.value;
-    if(targetName==='stockNo'){
+    if (targetName === 'stockNo') {
       this.setState({
         searchParams: {
           stockNo: targetValue,
@@ -59,18 +33,18 @@ class App extends Component {
           to: this.state.searchParams.to
         },
       })
-    }else if (targetName==='from'){
+    } else if (targetName === 'from') {
       this.setState({
         searchParams: {
-          stockNo:  this.state.searchParams.stockNo,
+          stockNo: this.state.searchParams.stockNo,
           from: targetValue,
           to: this.state.searchParams.to
         },
       })
-    }else if (targetName==='to'){
+    } else if (targetName === 'to') {
       this.setState({
         searchParams: {
-          stockNo:  this.state.searchParams.stockNo,
+          stockNo: this.state.searchParams.stockNo,
           from: this.state.searchParams.from,
           to: targetValue
         },
@@ -79,43 +53,58 @@ class App extends Component {
 
   }
 
+  // searchHandler = (event) => {
+  //   event.preventDefault();
+  //   ipcRenderer.once('update-query-stock', (event, resp) => {
+  //     if (resp) {
+  //       let newData = resp.map(elm => {
+  //         return { time: elm.time_stamp, value: elm.close }
+  //       });
+  //       this.setState({
+  //         stockData: {
+  //           title: 'stock',
+  //           data: newData
+  //         }
+  //       })
+  //     }
+  //   })
+  //   ipcRenderer.send('request-get-stock', this.state.searchParams);
+
+  // };
+
   searchHandler = (event) => {
     event.preventDefault();
-    ipcRenderer.once('update-query-stock', (event,resp)=>{
-      if (resp){
-        let newData = resp.map( elm => {
-          return {time:elm.time_stamp, value:elm.close}
-        } );
+    ipcRenderer.once('update-query-stock', (event, resp) => {
+      if (resp) {
         this.setState({
-          stockData: {
-            title: 'stock',
-            data: newData
-          }
+          data: resp
         })
       }
     })
-    ipcRenderer.send('request-get-stock',this.state.searchParams);
-    
+    ipcRenderer.send('request-get-stock', this.state.searchParams);
+
   };
 
   render() {
+
     return (
       <div className={classes.App}>
         <div className={classes.flex1}>
-          <Form 
+          <Form
             stock={this.state.searchParams.stockNo}
             from={this.state.searchParams.from}
             to={this.state.searchParams.to}
-            changed={(event)=>{this.formChangeHandler(event)}}
+            changed={(event) => { this.formChangeHandler(event) }}
             onQuery={this.searchHandler}>
           </Form>
         </div>
         <div className={classes.flex2}>
-          <LineChart
+          {/* <LineChart
             data={this.state.stockData.data}
             title={this.state.stockData.title}
             color="#3E517A"
-          />
+          /> */}
+          <PlotlyChart data={this.state.data} />
         </div>
       </div>
     );
