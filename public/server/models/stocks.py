@@ -28,7 +28,7 @@ class StockModel():
             self.db.row_factory = self.dict_factory
             cur = self.db.cursor()
             cur.execute('''
-            SELECT * from stock_price WHERE "index" >= "{}" AND "index" <= "{}"
+            SELECT * from stock_price WHERE "index" >= "{}" AND "index" <= "{}" order by "index"
             '''.format(fromDate,toDate))
             rows = cur.fetchall()
             df = pd.DataFrame(rows)
