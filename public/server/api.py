@@ -8,8 +8,9 @@ import websockets
 import json
 from loguru import logger
 from models.stocks import StockModel
+import algo
 
-dbPath = r'Z:\share\database'
+dbPath = r'C:\database'
 
 
 class PyServerAPI(object):
@@ -42,7 +43,7 @@ class PyServerAPI(object):
                 elif cmd == 'isInited':
                     await self.sendMsg(websocket,'reply_init_ok')
                 elif cmd == 'getStock':
-                    db_path = os.path.join(dbPath, 'tw_'+data['stockNo']+'.db')
+                    db_path = os.path.join(dbPath,'yahoo','tw', 'tw_'+data['stockNo']+'.db')
                     stock = StockModel(db_path)
                     recs = stock.get_by_stockNo(fromDate=data['from'], toDate=data['to'])
                     await self.sendMsg(websocket,'reply_getStock',recs)

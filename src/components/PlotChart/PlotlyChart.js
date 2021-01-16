@@ -9,7 +9,7 @@ const PlotlyChart = props => {
 
         var raw = {
 
-            x: props.data.map(elm => elm.index),
+            x: props.data.map(elm => elm.date),
             close: props.data.map(elm => elm.close),
             decreasing: { line: { color: 'green' } },
             high: props.data.map(elm => elm.high),
@@ -23,7 +23,7 @@ const PlotlyChart = props => {
             name: 'raw'
         };
         var avg_5 = {
-            x: props.data.map(elm => elm.index),
+            x: props.data.map(elm => elm.date),
             y: props.data.map(elm => elm.avg_5),
             type: 'scatter',
             mode: 'lines+markers',
@@ -35,7 +35,7 @@ const PlotlyChart = props => {
             name: '周線(avg5)'
         };
         var avg_20 = {
-            x: props.data.map(elm => elm.index),
+            x: props.data.map(elm => elm.date),
             y: props.data.map(elm => elm.avg_20),
             type: 'scatter',
             mode: 'lines+markers',

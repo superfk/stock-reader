@@ -28,7 +28,7 @@ class StockModel():
             self.db.row_factory = self.dict_factory
             cur = self.db.cursor()
             cur.execute('''
-            SELECT * from stock_price WHERE "index" >= "{}" AND "index" <= "{}" order by "index"
+            SELECT * from stock_price WHERE "date" >= "{}" AND "date" <= "{}" order by "date"
             '''.format(fromDate,toDate))
             rows = cur.fetchall()
             df = pd.DataFrame(rows)
@@ -46,7 +46,7 @@ class StockModel():
             print(error_msg)
 
     def remove_duplicate(self,df):
-        df = df.drop_duplicates(subset=['index'], keep='first')
+        df = df.drop_duplicates(subset=['date'], keep='first')
         return df
     
     def moving_average(self,df, average=1):
@@ -54,8 +54,7 @@ class StockModel():
         return avg_data
 
 if __name__ == '__main__':
-    dbPath = r'Z:\share\database'
-    db_path = os.path.join(dbPath,'tw_2301'+'.db')
+    dbPath = r'C:\database'
+    db_path = os.path.join(dbPath,'yahoo','tw','tw_0050.db')
     stock = StockModel(db_path)
     recs = stock.get_by_stockNo('2017-01-01', '2019-12-01')
-    print(recs)
