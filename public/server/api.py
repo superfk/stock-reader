@@ -9,6 +9,8 @@ import json
 from loguru import logger
 from models.stocks import StockModel
 import algo
+import numpy as np
+import pandas as pd
 
 dbPath = r'C:\database'
 
@@ -17,7 +19,7 @@ class PyServerAPI(object):
     def __init__(self):
         self.users = set()
         logger.add(sys.stdout, format="{time} - {level} - {message}")
-        logger.add(r"systemlog/{time:YYYY-MM-DD}/file_{time:YYYY-MM-DD}.log", rotation="10 MB")
+        logger.add(r"C:\\systemlog/{time:YYYY-MM-DD}/file_{time:YYYY-MM-DD}.log", rotation="10 MB")
         self.lg = logger
 
     async def register(self,websocket):
@@ -43,10 +45,15 @@ class PyServerAPI(object):
                 elif cmd == 'isInited':
                     await self.sendMsg(websocket,'reply_init_ok')
                 elif cmd == 'getStock':
-                    db_path = os.path.join(dbPath,'yahoo','tw', 'tw_'+data['stockNo']+'.db')
+                    countryCode = data['country']
+                    db_path = os.path.join(dbPath,'yahoo', countryCode, f'{countryCode}_'+data['stockNo']+'.db')
                     stock = StockModel(db_path)
-                    recs = stock.get_by_stockNo(fromDate=data['from'], toDate=data['to'])
-                    await self.sendMsg(websocket,'reply_getStock',recs)
+                    recs = stock.get_by_stockNo(fromDate=data['from'], toDate=data['to']) 
+                    df = pd.DataFrame(recs)  
+                    df = algo.get_moving_average(df, int(data['avg']))
+                    df = algo.strategy(df)
+                    data = df.to_dict(orient='records')
+                    await self.sendMsg(websocket,'reply_getStock', data)
                 elif cmd == 'close_all':
                     await self.sendMsg(websocket,'reply_closed_all')
                 else:
@@ -73,7 +80,6 @@ class PyServerAPI(object):
             self.lg.debug('error during send message with websocket')
             self.lg.debug(e)
             
-        
     async def continousSend(self):
         while True:
             try:
@@ -83,8 +89,7 @@ class PyServerAPI(object):
                 self.lg.debug('error during send ping message with websocket')
                 self.lg.debug(e)
             finally:
-                await asyncio.sleep(10)
-                   
+                await asyncio.sleep(10)  
 
 
 def main():

@@ -33,10 +33,6 @@ class StockModel():
             rows = cur.fetchall()
             df = pd.DataFrame(rows)
             df = self.remove_duplicate(df)
-            df_avg_5 = self.moving_average(df, 5)
-            df_avg_20 = self.moving_average(df, 20)
-            df[f"avg_{5}"] = df_avg_5.values
-            df[f"avg_{20}"] = df_avg_20.values
             data = df.to_dict(orient='records')
             self.close()
             return data

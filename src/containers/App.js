@@ -12,9 +12,11 @@ class App extends Component {
   state = {
 
     searchParams: {
-      stockNo: '',
-      from: '2020-01-01',
-      to: '2020-12-31'
+      stockNo: '2317',
+      avg: '5',
+      country: 'tw',
+      from: '2019-01-01',
+      to: '2021-12-31'
     },
 
     stockData: { data: [{ time: '', value: '' }], title: 'stock' },
@@ -28,24 +30,37 @@ class App extends Component {
     if (targetName === 'stockNo') {
       this.setState({
         searchParams: {
-          stockNo: targetValue,
-          from: this.state.searchParams.from,
-          to: this.state.searchParams.to
+          ...this.state.searchParams,
+          stockNo: targetValue
         },
+      })
+    } else if (targetName === 'average') {
+      this.setState({
+        searchParams: {
+          ...this.state.searchParams,
+          avg: targetValue
+        },
+      })
+    } else if (targetName === 'country') {
+      this.setState((state, props) => {
+        return {
+          searchParams: {
+            ...this.state.searchParams,
+            country: state.searchParams.country === 'tw' ? 'us' : 'tw'
+          },
+        }
       })
     } else if (targetName === 'from') {
       this.setState({
         searchParams: {
-          stockNo: this.state.searchParams.stockNo,
-          from: targetValue,
-          to: this.state.searchParams.to
+          ...this.state.searchParams,
+          from: targetValue
         },
       })
     } else if (targetName === 'to') {
       this.setState({
         searchParams: {
-          stockNo: this.state.searchParams.stockNo,
-          from: this.state.searchParams.from,
+          ...this.state.searchParams,
           to: targetValue
         },
       })
@@ -53,31 +68,14 @@ class App extends Component {
 
   }
 
-  // searchHandler = (event) => {
-  //   event.preventDefault();
-  //   ipcRenderer.once('update-query-stock', (event, resp) => {
-  //     if (resp) {
-  //       let newData = resp.map(elm => {
-  //         return { time: elm.time_stamp, value: elm.close }
-  //       });
-  //       this.setState({
-  //         stockData: {
-  //           title: 'stock',
-  //           data: newData
-  //         }
-  //       })
-  //     }
-  //   })
-  //   ipcRenderer.send('request-get-stock', this.state.searchParams);
-
-  // };
-
   searchHandler = (event) => {
     event.preventDefault();
     ipcRenderer.once('update-query-stock', (event, resp) => {
       if (resp) {
         this.setState({
           data: resp
+        },()=>{
+          window.dispatchEvent(new Event('resize'));
         })
       }
     })
@@ -91,9 +89,7 @@ class App extends Component {
       <div className={classes.App}>
         <div className={classes.flex1}>
           <Form
-            stock={this.state.searchParams.stockNo}
-            from={this.state.searchParams.from}
-            to={this.state.searchParams.to}
+            searchParams={this.state.searchParams}
             changed={(event) => { this.formChangeHandler(event) }}
             onQuery={this.searchHandler}>
           </Form>
@@ -105,6 +101,7 @@ class App extends Component {
             color="#3E517A"
           /> */}
           <PlotlyChart data={this.state.data} />
+
         </div>
       </div>
     );
