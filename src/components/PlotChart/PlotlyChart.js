@@ -72,7 +72,7 @@ const PlotlyChart = props => {
         };
         const slope = {
             x: props.data.map(elm => elm.date),
-            y: props.data.map(elm => elm.slope*100),
+            y: props.data.map(elm => elm.slope),
             type: 'scatter',
             mode: 'lines',
             yaxis: 'y4',

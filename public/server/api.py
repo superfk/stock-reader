@@ -4,8 +4,9 @@
 from __future__ import print_function
 import sys, os
 import asyncio
+import traceback
 import websockets
-import json
+import json, random
 from loguru import logger
 from models.stocks import StockModel
 import algo
@@ -60,12 +61,11 @@ class PyServerAPI(object):
                     self.lg.debug('Not found this cmd: {}'.format(cmd))
         except Exception as e:
             try:
-                err_msg = '{}'.format(e)
-                self.lg.debug(err_msg)
+                err_msg = traceback.format_exc()
+                print(err_msg)
                 await self.sendMsg(websocket,'reply_server_error',{'error':err_msg})
             except:
-                self.lg.debug('error during excetipn handling')
-                self.lg.debug(e)
+                pass
 
     async def sendMsg(self, websocket, cmd, data=None):
         msg = {'cmd': cmd, 'data': data}

@@ -34,26 +34,14 @@ def get_moving_average(df, period=22, plot=False):
 
 
 def get_kd(df, plot=False):
-    df2 = abstract.STOCH(df)
+    dfKD = df.drop(["adj_close"],axis = 1)
+    dfKD['K'], dfKD['D'] = abstract.STOCH(df.high, df.low, df.close, fastk_period=9,
+                                         slowk_period=3,
+                                         slowk_matype=1,
+                                         slowd_period=3,
+                                         slowd_matype=1)
 
-    if 'K' in df.columns:
-        df['K'] = df2['slowk']
-    if 'D' in df.columns:
-        df['D'] = df2['slowd']
-
-    if 'K' in df.columns or 'D' in df.columns:
-        return df
-
-    df3 = pd.concat([df, df2], axis=1)
-    if set(['K', 'D']).issubset(df.columns):
-        df['sum'] = df['A'] + df['C']
-    df3.rename({'slowk': 'K', 'slowd': 'D'}, axis=1, inplace=True)
-    if plot:
-        plt.figure()
-        ax = df3['close'].plot(figsize=(16, 8))
-        df3[['K', 'D']].plot(secondary_y=True, ax=ax, alpha=0.5)
-        plt.show()
-    return df3
+    return dfKD
 
 
 def get_named_avg(srcdf, targetDf, tag=''):
@@ -90,7 +78,7 @@ def strategyCore(KD_df, baseline=20.0, compare='lower', K2D='lower', name='event
     return KD_df
 
 def get_slopes(df, period=1):
-    df['slope'] = df['close'].rolling(period, min_periods=period).apply(lambda x: np.polyfit(x.index.values, x.values, 1)[0])
+    df['slope'] = df['close'].rolling(period).apply(lambda x: np.polyfit(x.index.values, x.values, 1)[0])
     return df
 
 def strategy(df, avg=1):
@@ -106,24 +94,24 @@ def strategy1(df):
     truey = np.ones((shape))
     df5 = get_moving_average(df, 5)
     df22 = get_moving_average(df, 22)
-    df5['manyhead'] = df5.close > df22.close
-    df5 = strategyCore(df5, 20.0, 'lower', 'greater', 'toBuy')
+    df5 = strategyCore(df5, 25.0, 'lower', 'greater', 'toBuy')
+    df5['manyhead'] = np.abs(df5.close - df22.close) < 0.5
     df5 = get_slopes(df5,5)
-    # df5['mask'] = df.close > df22.close
-    df5['mask'] = df5.slope > 0
-    condition = np.logical_and(df5['toBuy'], df5['manyhead'] )
-    condition = np.logical_and(condition, df5['mask'] )
+    df5['mask_slope'] = df5.slope > 0
+    condition = np.logical_and(df5['toBuy'], df5['mask_slope'] )
+    condition = np.logical_and(condition, df5['manyhead'] )
     df5['toBuyMany'] = np.where(condition, truey, zeroy).astype('bool')
     dfFinal = df.copy()
     dfFinal = get_named_avg(df5,dfFinal,'_wk')
     dfFinal = get_named_avg(df22,dfFinal,'_mo')
     dfFinal['K'] = df5['K']
     dfFinal['D'] = df5['D']
-    condition = np.logical_and(df5['toBuy'], df5['mask'] )
-    dfFinal['toBuy'] = np.where(condition, truey, zeroy).astype('bool')
+    condition2 = np.logical_and(df5['toBuy'], df5['mask_slope'] )
+    dfFinal['toBuy'] = np.where(condition2, truey, zeroy).astype('bool')
     dfFinal['toBuyMany'] = df5['toBuyMany']
     dfFinal['slope'] = df5['slope']
     dfFinal = dfFinal.replace({np.nan: None})
+    print(dfFinal)
     return dfFinal
 
 def main():
