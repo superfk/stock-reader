@@ -110,7 +110,7 @@ def strategy1(df):
     df5 = strategyCore(df5, 20.0, 'lower', 'greater', 'toBuy')
     df5 = get_slopes(df5,5)
     # df5['mask'] = df.close > df22.close
-    df5['mask'] = df5.slope < 0
+    df5['mask'] = df5.slope > 0
     condition = np.logical_and(df5['toBuy'], df5['manyhead'] )
     condition = np.logical_and(condition, df5['mask'] )
     df5['toBuyMany'] = np.where(condition, truey, zeroy).astype('bool')

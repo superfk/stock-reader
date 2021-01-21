@@ -75,10 +75,10 @@ const PlotlyChart = props => {
             y: props.data.map(elm => elm.slope*100),
             type: 'scatter',
             mode: 'lines',
-            yaxis: 'y2',
+            yaxis: 'y4',
             marker: { color: 'rgba(53, 34 , 125, 0.6)', size: 0 },
             line: {
-                color: 'rgba(53, 34 , 125, 0.4)',
+                color: 'rgba(53, 212 , 125, 0.4)',
                 width: 3
             },
             name: 'Slope'
@@ -125,7 +125,7 @@ const PlotlyChart = props => {
                 color: 'rgba(0, 0, 255, 0.603)',
                 width: 5
             },
-            name: 'to Buy Many'
+            name: 'to STRONGLY Buy'
         };
 
         var toSell = {
@@ -180,7 +180,7 @@ const PlotlyChart = props => {
                     showlegend: true,
                     xaxis: {
                         autorange: true,
-                        domain: [0, 1],
+                        domain: [0, 0.95],
                         title: 'Date',
                         type: 'date'
                     },
@@ -196,12 +196,24 @@ const PlotlyChart = props => {
                         tickfont: { color: 'rgb(148, 103, 189)' },
                         overlaying: 'y',
                         side: 'right',
-                        domain: [0.4, 1]
+                        domain: [0.4, 1],
+                        anchor: 'x',
+                        position: 0.9
                     },
                     yaxis3: {
                         title: 'Volume',
                         domain: [0, 0.3]
-                    }
+                    },
+                    yaxis4: {
+                        title: 'Weekly Slope',
+                        titlefont: { color: 'rgb(148, 103, 189)' },
+                        tickfont: { color: 'rgb(148, 103, 189)' },
+                        overlaying: 'y',
+                        side: 'right',
+                        domain: [0.4, 1],
+                        anchor: 'free',
+                        position: 1
+                    },
                 }
             }
             config={{
