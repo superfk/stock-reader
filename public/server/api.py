@@ -50,8 +50,8 @@ class PyServerAPI(object):
                     stock = StockModel(db_path)
                     recs = stock.get_by_stockNo(fromDate=data['from'], toDate=data['to']) 
                     df = pd.DataFrame(recs)  
-                    df = algo.get_moving_average(df, int(data['avg']))
-                    df = algo.strategy(df)
+                    # df = algo.strategy(df, avg=int(data['avg']))
+                    df = algo.strategy1(df)
                     data = df.to_dict(orient='records')
                     await self.sendMsg(websocket,'reply_getStock', data)
                 elif cmd == 'close_all':

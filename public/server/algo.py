@@ -20,16 +20,17 @@ def ploting(df):
 
 
 def get_moving_average(df, period=22, plot=False):
+    newdf = df.copy()
     if period > 1:
-        df[f'close'] = abstract.SMA(df['close'], timeperiod=period)
-        df[f'open'] = abstract.SMA(df['open'], timeperiod=period)
-        df[f'high'] = abstract.SMA(df['high'], timeperiod=period)
-        df[f'low'] = abstract.SMA(df['low'], timeperiod=period)
+        newdf[f'close'] = abstract.SMA(df['close'], timeperiod=period)
+        newdf[f'open'] = abstract.SMA(df['open'], timeperiod=period)
+        newdf[f'high'] = abstract.SMA(df['high'], timeperiod=period)
+        newdf[f'low'] = abstract.SMA(df['low'], timeperiod=period)
     if plot:
         plt.figure()
         ax = df.plot(figsize=(16, 8))
         plt.show()
-    return df
+    return newdf
 
 
 def get_kd(df, plot=False):
@@ -54,6 +55,13 @@ def get_kd(df, plot=False):
         plt.show()
     return df3
 
+
+def get_named_avg(srcdf, targetDf, tag=''):
+    targetDf[f'close{tag}'] = srcdf['close']
+    targetDf[f'open{tag}'] = srcdf['open']
+    targetDf[f'high{tag}'] = srcdf['high']
+    targetDf[f'low{tag}'] = srcdf['low']
+    return targetDf
 
 def strategyCore(KD_df, baseline=20.0, compare='lower', K2D='lower', name='event1'):
     KD_df = get_kd(KD_df)
@@ -81,13 +89,42 @@ def strategyCore(KD_df, baseline=20.0, compare='lower', K2D='lower', name='event
     KD_df.drop(columns=['cross', 'difference'])
     return KD_df
 
+def get_slopes(df, period=1):
+    df['slope'] = df['close'].rolling(period, min_periods=period).apply(lambda x: np.polyfit(x.index.values, x.values, 1)[0])
+    return df
 
-def strategy(df):
+def strategy(df, avg=1):
+    df = get_moving_average(df, avg)
     df = strategyCore(df, 20.0, 'lower', 'greater', 'toBuy')
     df = strategyCore(df, 80.0, 'greater', 'lower', 'toSell')
     df = df.replace({np.nan: None})
     return df
 
+def strategy1(df):
+    shape = len(df['close'].values[:])
+    zeroy = np.zeros((shape))
+    truey = np.ones((shape))
+    df5 = get_moving_average(df, 5)
+    df22 = get_moving_average(df, 22)
+    df5['manyhead'] = df5.close > df22.close
+    df5 = strategyCore(df5, 20.0, 'lower', 'greater', 'toBuy')
+    df5 = get_slopes(df5,5)
+    # df5['mask'] = df.close > df22.close
+    df5['mask'] = df5.slope < 0
+    condition = np.logical_and(df5['toBuy'], df5['manyhead'] )
+    condition = np.logical_and(condition, df5['mask'] )
+    df5['toBuyMany'] = np.where(condition, truey, zeroy).astype('bool')
+    dfFinal = df.copy()
+    dfFinal = get_named_avg(df5,dfFinal,'_wk')
+    dfFinal = get_named_avg(df22,dfFinal,'_mo')
+    dfFinal['K'] = df5['K']
+    dfFinal['D'] = df5['D']
+    condition = np.logical_and(df5['toBuy'], df5['mask'] )
+    dfFinal['toBuy'] = np.where(condition, truey, zeroy).astype('bool')
+    dfFinal['toBuyMany'] = df5['toBuyMany']
+    dfFinal['slope'] = df5['slope']
+    dfFinal = dfFinal.replace({np.nan: None})
+    return dfFinal
 
 def main():
     # 透過『get_function_groups』，取得分類後的技術指標清單
@@ -106,11 +143,21 @@ def main():
 
     recs = get_stock('2317')
     df = pd.DataFrame(recs)
-    df = get_moving_average(df, 1, False)
     print(df)
-    df = strategy(df, 80, 'greater', 'lower')
+    df5 = get_moving_average(df, 5)
+    print(df5)
+    df22 = get_moving_average(df, 22)
+    print(df22)
+    df['df5'] = df5.close
+    df['df22'] = df22.close
+    df['manyhead'] = df5.close > df22.close
     print(df)
 
+def test_strategy1():
+    recs = get_stock('2317')
+    df = pd.DataFrame(recs)
+    ret = strategy1(df)
+    print(ret)
 
 if __name__ == "__main__":
-    main()
+    test_strategy1()
