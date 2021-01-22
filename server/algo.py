@@ -19,13 +19,13 @@ def ploting(df):
     df.plot()
 
 
-def get_moving_average(df, period=22, plot=False):
+def get_moving_average(df, period=20, plot=False):
     newdf = df.copy()
     if period > 1:
-        newdf[f'close'] = abstract.SMA(df['close'], timeperiod=period)
-        newdf[f'open'] = abstract.SMA(df['open'], timeperiod=period)
-        newdf[f'high'] = abstract.SMA(df['high'], timeperiod=period)
-        newdf[f'low'] = abstract.SMA(df['low'], timeperiod=period)
+        newdf[f'close'] = talib.SMA(df['close'], timeperiod=period)
+        newdf[f'open'] = talib.SMA(df['open'], timeperiod=period)
+        newdf[f'high'] = talib.SMA(df['high'], timeperiod=period)
+        newdf[f'low'] = talib.SMA(df['low'], timeperiod=period)
     if plot:
         plt.figure()
         ax = df.plot(figsize=(16, 8))
@@ -35,7 +35,7 @@ def get_moving_average(df, period=22, plot=False):
 
 def get_kd(df, plot=False):
     dfKD = df.drop(["adj_close"],axis = 1)
-    dfKD['K'], dfKD['D'] = abstract.STOCH(df.high, df.low, df.close, fastk_period=9,
+    dfKD['K'], dfKD['D'] = talib.STOCH(df.high, df.low, df.close, fastk_period=9,
                                          slowk_period=3,
                                          slowk_matype=1,
                                          slowd_period=3,
@@ -66,19 +66,19 @@ def strategyCore(KD_df, baseline=20.0, compare='lower', K2D='lower', name='event
     if K2D == 'lower':
         KD_df['difference'] = KD_df.K - KD_df.D
         KD_df['cross'] = np.sign(KD_df.difference.shift(1))!=np.sign(KD_df.difference)
-        condition = np.logical_and(condition, KD_df['cross'])
+        # condition = np.logical_and(condition, KD_df['cross'])
         condition = np.logical_and(condition, KD_df['K'] < KD_df['D'])
     elif K2D == 'greater':
         KD_df['difference'] = KD_df.K - KD_df.D
         KD_df['cross'] = np.sign(KD_df.difference.shift(1))!=np.sign(KD_df.difference)
-        condition = np.logical_and(condition, KD_df['cross'])
+        # condition = np.logical_and(condition, KD_df['cross'])
         condition = np.logical_and(condition, KD_df['K'] > KD_df['D'])
     KD_df[name] = np.where(condition, truey, zeroy).astype('bool')
     KD_df.drop(columns=['cross', 'difference'])
     return KD_df
 
 def get_slopes(df, period=1):
-    df['slope'] = df['close'].rolling(period).apply(lambda x: np.polyfit(x.index.values, x.values, 1)[0])
+    df['slope'] = df['close'].rolling(period, min_periods=2).apply(lambda x: np.polyfit(x.index.values, x.values, 1)[0])
     return df
 
 def strategy(df, avg=1):
@@ -88,30 +88,29 @@ def strategy(df, avg=1):
     df = df.replace({np.nan: None})
     return df
 
-def strategy1(df):
+def strategy1(df, params):
+    dfFinal = df.copy()
+    dfFinal = strategyCore(df, int(params['kd']), 'lower', 'greater', 'toBuy')
+    dfFinal = get_slopes(dfFinal, int(params['slope']))
+    dfFinal['mask_slope'] = dfFinal.slope > 0
+
     shape = len(df['close'].values[:])
     zeroy = np.zeros((shape))
     truey = np.ones((shape))
     df5 = get_moving_average(df, 5)
-    df22 = get_moving_average(df, 22)
-    df5 = strategyCore(df5, 25.0, 'lower', 'greater', 'toBuy')
-    df5['manyhead'] = np.abs(df5.close - df22.close) < 0.5
-    df5 = get_slopes(df5,5)
-    df5['mask_slope'] = df5.slope > 0
-    condition = np.logical_and(df5['toBuy'], df5['mask_slope'] )
+    df20 = get_moving_average(df, 20)
+    df5['manyhead'] = df5.close > df20.close
+    condition = np.logical_and(dfFinal['toBuy'], dfFinal['mask_slope'] )
+    dfFinal['toBuy'] = np.where(condition, truey, zeroy).astype('bool')
+
+    condition = np.logical_and(dfFinal['toBuy'], dfFinal['mask_slope'] )
     condition = np.logical_and(condition, df5['manyhead'] )
-    df5['toBuyMany'] = np.where(condition, truey, zeroy).astype('bool')
-    dfFinal = df.copy()
+    dfFinal['toBuyMany'] = np.where(condition, truey, zeroy).astype('bool')
+
     dfFinal = get_named_avg(df5,dfFinal,'_wk')
-    dfFinal = get_named_avg(df22,dfFinal,'_mo')
-    dfFinal['K'] = df5['K']
-    dfFinal['D'] = df5['D']
-    condition2 = np.logical_and(df5['toBuy'], df5['mask_slope'] )
-    dfFinal['toBuy'] = np.where(condition2, truey, zeroy).astype('bool')
-    dfFinal['toBuyMany'] = df5['toBuyMany']
-    dfFinal['slope'] = df5['slope']
+    dfFinal = get_named_avg(df20,dfFinal,'_mo')
     dfFinal = dfFinal.replace({np.nan: None})
-    print(dfFinal)
+    print(dfFinal.tail(20))
     return dfFinal
 
 def main():
@@ -134,11 +133,11 @@ def main():
     print(df)
     df5 = get_moving_average(df, 5)
     print(df5)
-    df22 = get_moving_average(df, 22)
-    print(df22)
+    df20 = get_moving_average(df, 20)
+    print(df20)
     df['df5'] = df5.close
-    df['df22'] = df22.close
-    df['manyhead'] = df5.close > df22.close
+    df['df20'] = df20.close
+    df['manyhead'] = df5.close > df20.close
     print(df)
 
 def test_strategy1():

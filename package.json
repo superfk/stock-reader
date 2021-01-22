@@ -1,7 +1,7 @@
 {
   "name": "stock-reader",
   "version": "0.1.0",
-  "main": "public/electron.js",
+  "main": "electron.js",
   "homepage": "./",
   "build": {
     "productName": "stockReader",
@@ -9,13 +9,16 @@
     "copyright": "shawn",
     "buildVersion": "0.9.0",
     "directories": {
-      "output": "dist",
-      "buildResources": "build"
+      "output": "dist"
     },
     "win": {
       "icon": "build/icon.ico",
       "files": [
-        "**/*",
+        "build/**/*",
+        "node_modules/**/*",
+        "package.json",
+        "!venv/**/*",
+        "!src/**/*",
         "!**/build/xpyserver_dist/*",
         "!**/build/builds/*",
         "!**/.vscode/*",
@@ -26,13 +29,14 @@
       ],
       "extraFiles": [
         {
-          "from": "build/pyserver_dist",
+          "from": "pyserver_dist",
           "to": "pyserver_dist",
           "filter": [
             "**/*"
           ]
         }
       ],
+      "requestedExecutionLevel": "requireAdministrator",
       "target": [
         {
           "target": "nsis",
@@ -70,12 +74,13 @@
   },
   "scripts": {
     "react-start": "react-scripts start",
-    "build-react": "react-scripts build",
+    "build-react": "react-scripts --max_old_space_size=4096 build",
     "react-test": "react-scripts test",
     "react-eject": "react-scripts eject",
-    "build-electron": "electron-builder",
-    "build": "yarn build-react && yarn build-electron",
-    "start": "concurrently \"cross-env BROWSER=none npm run react-start\" \"wait-on http://localhost:3000 && electron .\""
+    "build-electron": "electron-builder build --win -c.extraMetadata.main=build/electron.js --publish never",
+    "build": "yarn build-react && copy C:\\stock-reader\\electron.js C:\\stock-reader\\build\\electron.js && yarn build-electron",
+    "start": "concurrently \"cross-env BROWSER=none npm run react-start\" \"wait-on http://localhost:3000 && electron .\"",
+    "build-electron-publish": "electron-builder build --win -c.extraMetadata.main=build/electron.js --publish always"
   },
   "devDependencies": {
     "concurrently": "^5.0.0",

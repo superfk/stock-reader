@@ -2,9 +2,8 @@
 
 block_cipher = None
 
-
 a = Analysis(['api.py'],
-             pathex=['D:\\03_Coding\\web\\stock-reader\\public\\server'],
+             pathex=['C:\\stock-reader\\server'],
              binaries=[],
              datas=[],
              hiddenimports=['pkg_resources.py2_warn'],

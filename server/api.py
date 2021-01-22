@@ -52,7 +52,7 @@ class PyServerAPI(object):
                     recs = stock.get_by_stockNo(fromDate=data['from'], toDate=data['to']) 
                     df = pd.DataFrame(recs)  
                     # df = algo.strategy(df, avg=int(data['avg']))
-                    df = algo.strategy1(df)
+                    df = algo.strategy1(df, data)
                     data = df.to_dict(orient='records')
                     await self.sendMsg(websocket,'reply_getStock', data)
                 elif cmd == 'close_all':

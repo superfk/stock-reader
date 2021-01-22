@@ -3,6 +3,11 @@ import classes from './Form.module.css'
 
 const form = props => {
 
+    const changed = (e) => {
+        props.changed(e);
+        props.onQuery()
+    }
+
 
 
     return <div className={classes.Form}>
@@ -13,6 +18,10 @@ const form = props => {
                 <input type='text' name='stockNo' value={props.searchParams.stockNo} onChange={props.changed} ></input>
                 <label >Average:</label>
                 <input type='number' name='average' value={props.searchParams.avg} onChange={props.changed} ></input>
+                <label >KD Baseline:</label>
+                <input type='number' name='kd' value={props.searchParams.kd} onChange={changed} ></input>
+                <label >Slope:</label>
+                <input type='number' name='slope' value={props.searchParams.slope} onChange={changed} ></input>
                 <div>
                     <label style={{ width: 100 }}>選擇股市:</label>
                     <label style={{ width: 80 }}><input type="radio" name="country" value="tw" onChange={props.changed} checked={props.searchParams.country === 'tw'} style={{ maxWidth: 20 }} />台股</label>

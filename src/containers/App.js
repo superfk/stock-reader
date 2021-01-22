@@ -14,6 +14,8 @@ class App extends Component {
     searchParams: {
       stockNo: '2317',
       avg: '5',
+      kd: '20',
+      slope: '5',
       country: 'tw',
       from: '2019-01-01',
       to: '2021-12-31'
@@ -41,6 +43,24 @@ class App extends Component {
           avg: targetValue
         },
       })
+    } else if (targetName === 'kd') {
+      this.setState((state, props) => {
+        return {
+          searchParams: {
+            ...this.state.searchParams,
+            kd: state.searchParams.kd = targetValue
+          },
+        }
+      })
+    } else if (targetName === 'slope') {
+      this.setState((state, props) => {
+        return {
+          searchParams: {
+            ...this.state.searchParams,
+            slope: state.searchParams.slope = parseInt(targetValue) < 2 ? '2' : targetValue
+          },
+        }
+      })
     } else if (targetName === 'country') {
       this.setState((state, props) => {
         return {
@@ -65,16 +85,20 @@ class App extends Component {
         },
       })
     }
-
   }
 
   searchHandler = (event) => {
-    event.preventDefault();
+    try {
+
+      event.preventDefault();
+    } catch (err) {
+
+    }
     ipcRenderer.once('update-query-stock', (event, resp) => {
       if (resp) {
         this.setState({
           data: resp
-        },()=>{
+        }, () => {
           window.dispatchEvent(new Event('resize'));
         })
       }
