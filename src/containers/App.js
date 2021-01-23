@@ -16,6 +16,8 @@ class App extends Component {
       avg: '5',
       kd: '20',
       slope: '5',
+      slope_baseline: '0',
+      rsi: '30',
       country: 'tw',
       from: '2019-01-01',
       to: '2021-12-31'
@@ -61,7 +63,25 @@ class App extends Component {
           },
         }
       })
-    } else if (targetName === 'country') {
+    }else if (targetName === 'slope_baseline') {
+      this.setState((state, props) => {
+        return {
+          searchParams: {
+            ...this.state.searchParams,
+            slope_baseline: state.searchParams.slope_baseline = targetValue
+          },
+        }
+      })
+    } else if (targetName === 'rsi') {
+      this.setState((state, props) => {
+        return {
+          searchParams: {
+            ...this.state.searchParams,
+            rsi: state.searchParams.rsi = targetValue
+          },
+        }
+      })
+    }  else if (targetName === 'country') {
       this.setState((state, props) => {
         return {
           searchParams: {

@@ -113,6 +113,43 @@ def strategy1(df, params):
     print(dfFinal.tail(20))
     return dfFinal
 
+def strategy2(df, params):
+    
+    shape = len(df['close'].values[:])
+    zeroy = np.zeros((shape))
+    truey = np.ones((shape))
+
+    dfFinal = df.copy()
+    dfFinal = strategyCore(df, int(params['kd']), 'lower', 'greater', 'toBuy')
+    
+    dfFinal = get_slopes(dfFinal, int(params['slope']))
+    dfFinal['mask_slope'] = dfFinal.slope > float(params['slope_baseline'])
+
+    dfFinal['RSI_5'] = talib.RSI(df['close'], timeperiod=5)
+    dfFinal['RSI_15'] = talib.RSI(df['close'], timeperiod=15)
+    condition = np.logical_and(dfFinal['RSI_5'] < float(params['rsi']), dfFinal['RSI_15'] < float(params['rsi']))    
+    condition = np.logical_and(condition, dfFinal['RSI_5'] > dfFinal['RSI_15'] )
+    condition = np.logical_and(condition, dfFinal['mask_slope'] )
+    dfFinal['toBuy_RSI'] = np.where(condition, truey, zeroy).astype('bool')
+
+    df5 = get_moving_average(df, 5)
+    df20 = get_moving_average(df, 20)
+    df5['manyhead'] = df5.close > df20.close
+    condition = np.logical_and(dfFinal['toBuy'], dfFinal['mask_slope'] )
+    dfFinal['toBuy'] = np.where(condition, truey, zeroy).astype('bool')
+
+    condition = np.logical_and(dfFinal['toBuy'], dfFinal['mask_slope'] )
+    condition = np.logical_and(condition, df5['manyhead'] )
+    dfFinal['toBuyMany'] = np.where(condition, truey, zeroy).astype('bool')
+
+    dfFinal = get_named_avg(df5,dfFinal,'_wk')
+    dfFinal = get_named_avg(df20,dfFinal,'_mo')
+    dfFinal = dfFinal.replace({np.nan: None})
+    print(dfFinal.tail(20))
+    print(dfFinal['toBuy_RSI'])
+    return dfFinal
+
+
 def main():
     # 透過『get_function_groups』，取得分類後的技術指標清單
     all_ta_groups = talib.get_function_groups()

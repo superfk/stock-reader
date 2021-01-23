@@ -13,7 +13,7 @@ import algo
 import numpy as np
 import pandas as pd
 
-dbPath = r'C:\tw_stock_test\database'
+dbPath = r'C:\database'
 
 
 class PyServerAPI(object):
@@ -52,7 +52,7 @@ class PyServerAPI(object):
                     recs = stock.get_by_stockNo(fromDate=data['from'], toDate=data['to']) 
                     df = pd.DataFrame(recs)  
                     # df = algo.strategy(df, avg=int(data['avg']))
-                    df = algo.strategy1(df, data)
+                    df = algo.strategy2(df, data)
                     data = df.to_dict(orient='records')
                     await self.sendMsg(websocket,'reply_getStock', data)
                 elif cmd == 'close_all':

@@ -19,9 +19,13 @@ const form = props => {
                 <label >Average:</label>
                 <input type='number' name='average' value={props.searchParams.avg} onChange={props.changed} ></input>
                 <label >KD Baseline:</label>
-                <input type='number' name='kd' value={props.searchParams.kd} onChange={changed} ></input>
-                <label >Slope:</label>
-                <input type='number' name='slope' value={props.searchParams.slope} onChange={changed} ></input>
+                <input type='number' name='kd' value={props.searchParams.kd} onChange={props.changed} ></input>
+                <label >RSI:</label>
+                <input type='number' name='rsi' value={props.searchParams.rsi} onChange={props.changed} ></input>
+                <label >Slope Interval:</label>
+                <input type='number' name='slope' value={props.searchParams.slope} onChange={props.changed} ></input>
+                <label >Slope Baseline:</label>
+                <input type='number' name='slope_baseline' value={props.searchParams.slope_baseline} onChange={props.changed} ></input>
                 <div>
                     <label style={{ width: 100 }}>選擇股市:</label>
                     <label style={{ width: 80 }}><input type="radio" name="country" value="tw" onChange={props.changed} checked={props.searchParams.country === 'tw'} style={{ maxWidth: 20 }} />台股</label>

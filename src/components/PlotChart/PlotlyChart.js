@@ -70,6 +70,32 @@ const PlotlyChart = props => {
             },
             name: 'D'
         };
+        const RSI_5 = {
+            x: props.data.map(elm => elm.date),
+            y: props.data.map(elm => elm.RSI_5),
+            type: 'scatter',
+            mode: 'lines',
+            yaxis: 'y2',
+            marker: { color: 'rgba(0, 0, 255, 0.7)', size: 0 },
+            line: {
+                color: 'rgba(123, 34, 212, 0.703)',
+                width: 1
+            },
+            name: 'RSI_5'
+        };
+        const RSI_15 = {
+            x: props.data.map(elm => elm.date),
+            y: props.data.map(elm => elm.RSI_15),
+            type: 'scatter',
+            mode: 'lines',
+            yaxis: 'y2',
+            marker: { color: 'rgba(0, 0, 255, 0.7)', size: 0 },
+            line: {
+                color: 'rgba(234, 25, 168, 0.603)',
+                width: 1
+            },
+            name: 'RSI_15'
+        };
         const slope = {
             x: props.data.map(elm => elm.date),
             y: props.data.map(elm => elm.slope),
@@ -117,10 +143,10 @@ const PlotlyChart = props => {
                 opacity: 0.5,
                 size: 20,
                 line: {
-                  color: 'rgb(231, 99, 250)',
-                  width: 2
+                    color: 'rgb(231, 99, 250)',
+                    width: 2
                 }
-              },
+            },
             line: {
                 color: 'rgba(0, 0, 255, 0.603)',
                 width: 5
@@ -128,6 +154,32 @@ const PlotlyChart = props => {
             name: 'to STRONGLY Buy'
         };
 
+        var toBuy_RSI = {
+            x: props.data.map(elm => elm.date),
+            y: props.data.map(elm => {
+                if (elm.toBuy_RSI) {
+                    return elm.close;
+                } else {
+                    return null
+                }
+            }),
+            type: 'scatter',
+            mode: 'markers',
+            marker: {
+                color: 'rgb(55, 243, 123)',
+                opacity: 0.5,
+                size: 20,
+                line: {
+                    color: 'rgb(124, 99, 124)',
+                    width: 2
+                }
+            },
+            line: {
+                color: 'rgba(125, 0, 255, 0.603)',
+                width: 5
+            },
+            name: 'to Buy RST'
+        };
         var toSell = {
             x: props.data.map(elm => elm.date),
             y: props.data.map(elm => {
@@ -155,7 +207,7 @@ const PlotlyChart = props => {
             marker: { color: 'rgb(89,214,72)', size: 10 },
         }
 
-        setData([raw, rawWK, rawMO, K, D,slope, toBuy, toSell, volumes, toBuyMany])
+        setData([raw, rawWK, rawMO, K, D, RSI_5, RSI_15 , slope, toBuy, toSell, volumes, toBuyMany, toBuy_RSI])
 
     }, [props.data])
 
