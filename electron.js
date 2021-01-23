@@ -167,11 +167,7 @@ const createWindow = () => {
 
   mainWindow.maximize();
 
-  if (isDev){
-    mainWindow.webContents.openDevTools();
-  }else {
-    mainWindow.removeMenu();
-  }
+  mainWindow.removeMenu();
 
   mainWindow.once('ready-to-show', () => {
     mainWindow.show();

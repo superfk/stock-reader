@@ -126,7 +126,7 @@ const PlotlyChart = props => {
             x: props.data.map(elm => elm.date),
             y: props.data.map(elm => {
                 if (elm.toBuy) {
-                    return elm.close;
+                    return elm.close_wk;
                 } else {
                     return null
                 }
@@ -144,7 +144,7 @@ const PlotlyChart = props => {
             x: props.data.map(elm => elm.date),
             y: props.data.map(elm => {
                 if (elm.toBuyMany) {
-                    return elm.close;
+                    return elm.close_wk;
                 } else {
                     return null
                 }
@@ -171,7 +171,7 @@ const PlotlyChart = props => {
             x: props.data.map(elm => elm.date),
             y: props.data.map(elm => {
                 if (elm.toBuy_RSI) {
-                    return elm.close;
+                    return elm.close_wk;
                 } else {
                     return null
                 }
@@ -191,13 +191,13 @@ const PlotlyChart = props => {
                 color: 'rgba(125, 0, 255, 0.603)',
                 width: 5
             },
-            name: 'to Buy RST'
+            name: 'to Buy RSI'
         };
         var toSell = {
             x: props.data.map(elm => elm.date),
             y: props.data.map(elm => {
                 if (elm.toSell) {
-                    return elm.close;
+                    return elm.close_wk;
                 } else {
                     return null
                 }
@@ -211,6 +211,58 @@ const PlotlyChart = props => {
             },
             name: 'to Sell'
         };
+        var toSellMany = {
+            x: props.data.map(elm => elm.date),
+            y: props.data.map(elm => {
+                if (elm.toSellMany) {
+                    return elm.close_wk;
+                } else {
+                    return null
+                }
+            }),
+            type: 'scatter',
+            mode: 'markers',
+            marker: {
+                color: 'rgb(236,76,46)',
+                opacity: 0.5,
+                size: 20,
+                line: {
+                    color: 'rgb(21, 144, 233)',
+                    width: 2
+                }
+            },
+            line: {
+                color: 'rgba(0, 0, 255, 0.603)',
+                width: 5
+            },
+            name: 'to STRONGLY Sell'
+        };
+        var toSell_RSI = {
+            x: props.data.map(elm => elm.date),
+            y: props.data.map(elm => {
+                if (elm.toSell_RSI) {
+                    return elm.close_wk;
+                } else {
+                    return null
+                }
+            }),
+            type: 'scatter',
+            mode: 'markers',
+            marker: {
+                color: 'rgb(236,137,46)',
+                opacity: 0.8,
+                size: 20,
+                line: {
+                    color: 'rgb(13, 224, 51)',
+                    width: 2
+                }
+            },
+            line: {
+                color: 'rgba(23, 33, 33, 0.603)',
+                width: 5
+            },
+            name: 'to Sell RSI'
+        };
         const volumes = {
             x: props.data.map(elm => elm.date),
             y: props.data.map(elm => elm.volume),
@@ -220,7 +272,7 @@ const PlotlyChart = props => {
             marker: { color: 'rgb(89,214,72)', size: 10 },
         }
 
-        setData([raw, rawWK, rawMO, K, D, RSI_5, RSI_15 , slope, toBuy, toSell, volumes, toBuyMany, toBuy_RSI])
+        setData([raw, rawWK, rawMO, K, D, RSI_5, RSI_15, slope, toBuy, toSell, volumes, toBuyMany, toBuy_RSI, toSellMany, toSell_RSI])
 
     }, [props.data])
 
