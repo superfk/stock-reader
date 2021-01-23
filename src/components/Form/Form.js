@@ -3,13 +3,6 @@ import classes from './Form.module.css'
 
 const form = props => {
 
-    const changed = (e) => {
-        props.changed(e);
-        props.onQuery()
-    }
-
-
-
     return <div className={classes.Form}>
         <h2>Stock Selector</h2>
         <form className={classes.FormContent}>

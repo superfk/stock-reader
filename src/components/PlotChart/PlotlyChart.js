@@ -18,7 +18,8 @@ const PlotlyChart = props => {
             type: 'candlestick',
             xaxis: 'x',
             yaxis: 'y',
-            name: 'raw'
+            name: 'raw',
+            showlegend: true,
         };
         var rawWK = {
             x: props.data.map(elm => elm.date),
@@ -30,7 +31,8 @@ const PlotlyChart = props => {
                 color: 'rgba(235, 31, 255, 0.603)',
                 width: 2
             },
-            name: 'wk'
+            name: 'wk',
+            showlegend: true,
         };
         var rawMO = {
             x: props.data.map(elm => elm.date),
@@ -42,7 +44,8 @@ const PlotlyChart = props => {
                 color: 'rgba(52, 44, 215, 0.603)',
                 width: 2
             },
-            name: 'mo'
+            name: 'mo',
+            showlegend: true,
         };
         const K = {
             x: props.data.map(elm => elm.date),
@@ -55,7 +58,9 @@ const PlotlyChart = props => {
                 color: 'rgba(0, 0, 255, 0.603)',
                 width: 1
             },
-            name: 'K'
+            name: 'K',
+            showlegend: 'legendonly',
+            visible: 'legendonly'
         };
         const D = {
             x: props.data.map(elm => elm.date),
@@ -68,7 +73,9 @@ const PlotlyChart = props => {
                 color: 'rgba(0, 238, 168, 0.603)',
                 width: 1
             },
-            name: 'D'
+            name: 'D',
+            showlegend: 'legendonly',
+            visible: 'legendonly'
         };
         const RSI_5 = {
             x: props.data.map(elm => elm.date),
@@ -81,7 +88,9 @@ const PlotlyChart = props => {
                 color: 'rgba(123, 34, 212, 0.703)',
                 width: 1
             },
-            name: 'RSI_5'
+            name: 'RSI_5',
+            showlegend: 'legendonly',
+            visible: 'legendonly'
         };
         const RSI_15 = {
             x: props.data.map(elm => elm.date),
@@ -94,7 +103,9 @@ const PlotlyChart = props => {
                 color: 'rgba(234, 25, 168, 0.603)',
                 width: 1
             },
-            name: 'RSI_15'
+            name: 'RSI_15',
+            showlegend: 'legendonly',
+            visible: 'legendonly'
         };
         const slope = {
             x: props.data.map(elm => elm.date),
@@ -107,7 +118,9 @@ const PlotlyChart = props => {
                 color: 'rgba(53, 212 , 125, 0.4)',
                 width: 3
             },
-            name: 'Slope'
+            name: 'Slope',
+            showlegend: 'legendonly',
+            visible: 'legendonly'
         };
         var toBuy = {
             x: props.data.map(elm => elm.date),
@@ -229,7 +242,6 @@ const PlotlyChart = props => {
                     },
                     legend: { "orientation": "h", x: 0, xanchor: 'left', y: 1.2, yanchor: 'top' },
                     autosize: true,
-                    showlegend: true,
                     xaxis: {
                         autorange: true,
                         domain: [0, 0.95],

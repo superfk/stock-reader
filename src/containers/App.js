@@ -14,10 +14,10 @@ class App extends Component {
     searchParams: {
       stockNo: '2317',
       avg: '5',
-      kd: '20',
+      kd: '30',
       slope: '5',
       slope_baseline: '0',
-      rsi: '30',
+      rsi: '35',
       country: 'tw',
       from: '2019-01-01',
       to: '2021-12-31'

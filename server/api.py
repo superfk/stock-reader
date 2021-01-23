@@ -13,7 +13,7 @@ import algo
 import numpy as np
 import pandas as pd
 
-dbPath = r'C:\database'
+dbPath = r'C:\tw_stock_test\database'
 
 
 class PyServerAPI(object):
