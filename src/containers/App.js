@@ -25,8 +25,22 @@ class App extends Component {
 
     stockData: { data: [{ time: '', value: '' }], title: 'stock' },
     data: [],
+    stockNames: []
 
   };
+
+  componentDidMount() {
+    const onGetStockNames = (event, data) => {
+      this.setState({
+        stockNames: data
+      })
+    }
+    ipcRenderer.on('reply_stock_names', onGetStockNames)
+    ipcRenderer.send('getStockNames');
+    return () => {
+      ipcRenderer.removeListener('reply_stock_names', onGetStockNames)
+    }
+  }
 
   formChangeHandler = (event) => {
     let targetName = event.target.name;
@@ -63,7 +77,7 @@ class App extends Component {
           },
         }
       })
-    }else if (targetName === 'slope_baseline') {
+    } else if (targetName === 'slope_baseline') {
       this.setState((state, props) => {
         return {
           searchParams: {
@@ -81,7 +95,7 @@ class App extends Component {
           },
         }
       })
-    }  else if (targetName === 'country') {
+    } else if (targetName === 'country') {
       this.setState((state, props) => {
         return {
           searchParams: {
@@ -133,6 +147,7 @@ class App extends Component {
       <div className={classes.App}>
         <div className={classes.flex1}>
           <Form
+            stocks={this.state.stockNames}
             searchParams={this.state.searchParams}
             changed={(event) => { this.formChangeHandler(event) }}
             onQuery={this.searchHandler}>

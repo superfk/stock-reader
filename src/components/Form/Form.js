@@ -1,14 +1,25 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import classes from './Form.module.css'
 
-const form = props => {
+const Form = props => {
+
+    const [options, setOptions] = useState([]);
+    useEffect(() => {
+        const stksOptions = props.stocks.map(elm=>{
+            return <option key={elm.code} value={elm.code}>{elm.code} - {elm.name}</option>
+        })
+        setOptions(stksOptions)
+    }, [props.stocks])
 
     return <div className={classes.Form}>
         <h2>Stock Selector</h2>
         <form className={classes.FormContent}>
             <div>
                 <label >Stock:</label>
-                <input type='text' name='stockNo' value={props.searchParams.stockNo} onChange={props.changed} ></input>
+                {/* <input type='text' name='stockNo' value={props.searchParams.stockNo} onChange={props.changed} ></input> */}
+                <select name='stockNo' value={props.searchParams.stockNo} onChange={props.changed}>
+                    {options}
+                </select>
                 <label >Average:</label>
                 <input type='number' name='average' value={props.searchParams.avg} onChange={props.changed} ></input>
                 <label >KD Baseline:</label>
@@ -41,4 +52,4 @@ const form = props => {
     </div>
 }
 
-export default form;
+export default Form;

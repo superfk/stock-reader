@@ -2,7 +2,7 @@ const electron = require('electron')
 const app = electron.app
 const BrowserWindow = electron.BrowserWindow
 const path = require('path')
-const {ipcMain, dialog, shell} = require('electron')
+const { ipcMain, dialog, shell } = require('electron')
 const appRoot = require('electron-root-path').rootPath;
 const ProgressBar = require('electron-progressbar');
 const isDev = require('electron-is-dev');
@@ -12,39 +12,42 @@ let ws;
 let mainWindow = null;
 
 function connect() {
-  try{
+  try {
     const WebSocket = require('ws');
     ws = new WebSocket('ws://127.0.0.1:6849');
-  }catch(e){
+  } catch (e) {
     console.log('Socket init error. Reconnect will be attempted in 1 second.', e.reason);
   }
 
-  ws.on('open', ()=> {
+  ws.on('open', () => {
     console.log('websocket in main connected')
-      init_server();
+    init_server();
   });
 
-  ws.on('ping',()=>{
-    
-    ws.send(tools.parseCmd('pong','from main'));
+  ws.on('ping', () => {
+
+    ws.send(tools.parseCmd('pong', 'from main'));
   })
 
-  ws.on('message',(message)=>{
-    try{
+  ws.on('message', (message) => {
+    try {
       msg = tools.parseServerMessage(message);
       // console.log(msg)
       let cmd = msg.cmd;
       let data = msg.data;
-      switch(cmd) {
+      switch (cmd) {
         case 'ping':
-          ws.send(tools.parseCmd('pong',data));
+          ws.send(tools.parseCmd('pong', data));
           break;
         case 'reply_init_ok':
-            createWindow();
-            break;
+          createWindow();
+          break;
+        case 'reply_stock_names':
+          mainWindow.webContents.send('reply_stock_names', data)
+          break;
         case 'reply_getStock':
-            mainWindow.webContents.send('update-query-stock',data)
-            break;
+          mainWindow.webContents.send('update-query-stock', data)
+          break;
         case 'reply_closed_all':
           app.quit();
           break;
@@ -52,19 +55,19 @@ function connect() {
           console.log('Not found this cmd ' + cmd)
           break;
       }
-    }catch(e){
+    } catch (e) {
       console.error(e)
     }
   });
 
-  ws.onclose = function(e) {
+  ws.onclose = function (e) {
     console.log('Socket is closed. Reconnect will be attempted in 1 second.', e.reason);
-    setTimeout(function() {
+    setTimeout(function () {
       connect();
     }, 5000);
   };
 
-  ws.onerror = function(err) {
+  ws.onerror = function (err) {
     console.error('Socket encountered error: ', err.message, 'Closing socket');
     ws.close();
   };
@@ -118,16 +121,16 @@ const createPyProc = () => {
     console.log('Found server exe:')
     console.log(script);
   } else {
-    pyProc = require('child_process').spawn('python', [script, port],{ stdio: 'ignore' })
+    pyProc = require('child_process').spawn('python', [script, port], { stdio: 'ignore' })
     // var batchFile = path.join(__dirname, PY_FOLDER,'start_python_server.bat')
     // var bat = shell.openItem(batchFile);
     // console.log(bat)
   }
- 
+
   if (pyProc != null) {
     //console.log(pyProc)
     console.log('child process success on port ' + port);
-    
+
 
   }
 }
@@ -139,7 +142,7 @@ const exitPyProc = () => {
 }
 
 // init config and database
-var init_server = function(){
+var init_server = function () {
   ws.send(tools.parseCmd('isInited'));
 }
 
@@ -154,7 +157,7 @@ app.on('will-quit', exitPyProc)
 
 const createWindow = () => {
   mainWindow = new BrowserWindow({
-    width: 1024, 
+    width: 1024,
     height: 600,
     webPreferences: {
       nodeIntegration: true
@@ -163,11 +166,11 @@ const createWindow = () => {
   mainWindow.loadURL(
     //  'http://localhost:3000' 
     isDev ? 'http://localhost:3000' : `file://${path.join(__dirname, "../build/index.html")}`
-    )
+  )
 
   mainWindow.maximize();
 
-  mainWindow.removeMenu();
+  // mainWindow.removeMenu();
 
   mainWindow.once('ready-to-show', () => {
     mainWindow.show();
@@ -193,8 +196,9 @@ app.on('activate', () => {
 /*************************************************************
  * iPC handler
  *************************************************************/
-
- ipcMain.on('request-get-stock', (event,data)=>{
-  ws.send(tools.parseCmd('getStock',data));
- })
- 
+ipcMain.on('getStockNames', (event) => {
+  ws.send(tools.parseCmd('getStockNames'));
+})
+ipcMain.on('request-get-stock', (event, data) => {
+  ws.send(tools.parseCmd('getStock', data));
+})

@@ -12,6 +12,7 @@ from models.stocks import StockModel
 import algo
 import numpy as np
 import pandas as pd
+from utility import get_stock_names
 
 dbPath = r'C:\tw_stock_test\database'
 
@@ -45,6 +46,10 @@ class PyServerAPI(object):
                     print('client pong: {}'.format(data))
                 elif cmd == 'isInited':
                     await self.sendMsg(websocket,'reply_init_ok')
+                elif cmd == 'getStockNames':
+                    db_path = os.path.join(dbPath)
+                    ret = get_stock_names(db_path)
+                    await self.sendMsg(websocket,'reply_stock_names', ret)
                 elif cmd == 'getStock':
                     countryCode = data['country']
                     db_path = os.path.join(dbPath,'yahoo', countryCode, f'{countryCode}_'+data['stockNo']+'.db')

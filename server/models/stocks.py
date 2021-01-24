@@ -4,6 +4,7 @@ import sqlite3
 import datetime
 import os, traceback
 import pandas as pd
+import requests
 
 class StockModel():
     def __init__(self, db_path):
@@ -49,8 +50,10 @@ class StockModel():
         avg_data = df.close.rolling(window=average, min_periods=1).mean()
         return avg_data
 
+
 if __name__ == '__main__':
     dbPath = r'C:\database'
     db_path = os.path.join(dbPath,'yahoo','tw','tw_0050.db')
-    stock = StockModel(db_path)
-    recs = stock.get_by_stockNo('2017-01-01', '2019-12-01')
+    # stock = StockModel(db_path)
+    # # recs = stock.get_by_stockNo('2017-01-01', '2019-12-01')
+    # stock.get_stock_names()
