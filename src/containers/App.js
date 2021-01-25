@@ -181,7 +181,6 @@ class App extends Component {
       from: fromDate.toISOString().substring(0, 10),
       to: now.toISOString().substring(0, 10)
     };
-    console.log(curParams)
     this.setState({
       searchParams: curParams
     })
