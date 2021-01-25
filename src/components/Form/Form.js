@@ -5,7 +5,7 @@ const Form = props => {
 
     const [options, setOptions] = useState([]);
     useEffect(() => {
-        const stksOptions = props.stocks.map(elm=>{
+        const stksOptions = props.stocks.map(elm => {
             return <option key={elm.code} value={elm.code}>{elm.code} - {elm.name}</option>
         })
         setOptions(stksOptions)
@@ -30,11 +30,6 @@ const Form = props => {
                 <input type='number' name='slope' value={props.searchParams.slope} onChange={props.changed} ></input>
                 <label >Slope Baseline:</label>
                 <input type='number' name='slope_baseline' value={props.searchParams.slope_baseline} onChange={props.changed} ></input>
-                <div>
-                    <label style={{ width: 100 }}>選擇股市:</label>
-                    <label style={{ width: 80 }}><input type="radio" name="country" value="tw" onChange={props.changed} checked={props.searchParams.country === 'tw'} style={{ maxWidth: 20 }} />台股</label>
-                    <label style={{ width: 80 }}><input type="radio" name="country" value="us" onChange={props.changed} checked={props.searchParams.country === 'us'} style={{ maxWidth: 20 }} />美股</label>
-                </div>
             </div>
             <div>
                 <label>Date From:</label>
@@ -47,8 +42,11 @@ const Form = props => {
             <div>
                 <button onClick={props.onQuery}>OK</button>
             </div>
-
         </form>
+
+        <div>
+            <button onClick={props.onFilterAll}>篩選所有符合股票</button>
+        </div>
     </div>
 }
 

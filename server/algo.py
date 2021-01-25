@@ -14,10 +14,8 @@ def get_stock(stockNo):
     recs = stock.get_by_stockNo('2019-01-01', '2021-12-01')
     return recs
 
-
 def ploting(df):
     df.plot()
-
 
 def get_moving_average(df, period=20, plot=False):
     newdf = df.copy()
@@ -79,12 +77,10 @@ def strategyCore(KD_df, baseline=20.0, compare='lower', K2D='lower', name='event
     KD_df.drop(columns=['cross', 'difference'])
     return KD_df
 
-
 def get_slopes(df, period=1):
     df['slope'] = df['close'].rolling(period, min_periods=2).apply(
         lambda x: np.polyfit(x.index.values, x.values, 1)[0])
     return df
-
 
 def strategy(df, avg=1):
     df = get_moving_average(df, avg)
@@ -179,7 +175,6 @@ def strategy2(df, params):
     dfFinal = get_named_avg(df5, dfFinal, '_wk')
     dfFinal = get_named_avg(df20, dfFinal, '_mo')
     dfFinal = dfFinal.replace({np.nan: None})
-    print(dfFinal.tail(20))
     return dfFinal
 
 

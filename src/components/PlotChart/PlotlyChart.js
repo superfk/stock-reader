@@ -19,7 +19,8 @@ const PlotlyChart = props => {
             xaxis: 'x',
             yaxis: 'y',
             name: 'raw',
-            showlegend: true,
+            showlegend: 'legendonly',
+            visible: 'legendonly'
         };
         var rawWK = {
             x: props.data.map(elm => elm.date),
@@ -178,17 +179,9 @@ const PlotlyChart = props => {
             }),
             type: 'scatter',
             mode: 'markers',
-            marker: {
-                color: 'rgb(55, 243, 123)',
-                opacity: 0.5,
-                size: 20,
-                line: {
-                    color: 'rgb(124, 99, 124)',
-                    width: 2
-                }
-            },
+            marker: { color: 'rgba(180,132,132,0.7)', size: 10 },
             line: {
-                color: 'rgba(125, 0, 255, 0.603)',
+                color: 'rgba(0, 0, 255, 0.603)',
                 width: 5
             },
             name: 'to Buy RSI'
@@ -248,17 +241,9 @@ const PlotlyChart = props => {
             }),
             type: 'scatter',
             mode: 'markers',
-            marker: {
-                color: 'rgb(236,137,46)',
-                opacity: 0.8,
-                size: 20,
-                line: {
-                    color: 'rgb(13, 224, 51)',
-                    width: 2
-                }
-            },
+            marker: { color: 'rgba(214,72,186, 0.7)', size: 10 },
             line: {
-                color: 'rgba(23, 33, 33, 0.603)',
+                color: 'rgba(0, 0, 255, 0.603)',
                 width: 5
             },
             name: 'to Sell RSI'

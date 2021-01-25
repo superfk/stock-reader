@@ -53,7 +53,7 @@ class StockModel():
 
 if __name__ == '__main__':
     dbPath = r'C:\database'
-    db_path = os.path.join(dbPath,'yahoo','tw','tw_0050.db')
-    # stock = StockModel(db_path)
-    # # recs = stock.get_by_stockNo('2017-01-01', '2019-12-01')
+    db_path = os.path.join(dbPath,'yahoo','us','us_0050.db')
+    stock = StockModel(db_path)
+    recs = stock.get_by_stockNo('2017-01-01', '2019-12-01')
     # stock.get_stock_names()

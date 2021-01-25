@@ -1,10 +1,25 @@
 import React, { Component } from 'react';
 import Form from '../components/Form/Form';
 import PlotlyChart from '../components/PlotChart/PlotlyChart';
+import StockItems from '../components/StockItems/StockItems';
 import classes from './App.module.css';
 
 const electron = window.require('electron');
 const ipcRenderer = electron.ipcRenderer;
+
+function formatDate(date) {
+  var d = new Date(date),
+      month = '' + (d.getMonth() + 1),
+      day = '' + d.getDate(),
+      year = d.getFullYear();
+
+  if (month.length < 2) 
+      month = '0' + month;
+  if (day.length < 2) 
+      day = '0' + day;
+
+  return [year, month, day].join('-');
+}
 
 
 class App extends Component {
@@ -25,7 +40,8 @@ class App extends Component {
 
     stockData: { data: [{ time: '', value: '' }], title: 'stock' },
     data: [],
-    stockNames: []
+    filteredData: [],
+    stockNames: [] // [{'code': code, 'country': country, 'name': name}]
 
   };
 
@@ -46,12 +62,17 @@ class App extends Component {
     let targetName = event.target.name;
     let targetValue = event.target.value;
     if (targetName === 'stockNo') {
-      this.setState({
-        searchParams: {
-          ...this.state.searchParams,
-          stockNo: targetValue
-        },
-      })
+      const coty = this.state.stockNames.find(elm=>elm.code===targetValue);
+      if (coty !== undefined){
+        this.setState({
+          searchParams: {
+            ...this.state.searchParams,
+            stockNo: targetValue,
+            country: coty.country
+          },
+        })
+      }
+      
     } else if (targetName === 'average') {
       this.setState({
         searchParams: {
@@ -95,15 +116,6 @@ class App extends Component {
           },
         }
       })
-    } else if (targetName === 'country') {
-      this.setState((state, props) => {
-        return {
-          searchParams: {
-            ...this.state.searchParams,
-            country: state.searchParams.country === 'tw' ? 'us' : 'tw'
-          },
-        }
-      })
     } else if (targetName === 'from') {
       this.setState({
         searchParams: {
@@ -140,6 +152,52 @@ class App extends Component {
     ipcRenderer.send('request-get-stock', this.state.searchParams);
 
   };
+  onFilterAll = (event) => {
+    try {
+      event.preventDefault();
+    } catch (err) {
+
+    }
+    ipcRenderer.once('reply_filterAll', (event, resp) => {
+      if (resp) {
+        console.log(resp)
+        this.setState({
+          filteredData: resp
+        }, () => {
+        })
+      }
+    })
+    ipcRenderer.send('filterAll', this.state.searchParams);
+  }
+  filterDataClicked = (code, date, country) => {
+    const now = new Date();
+    const fromDate = new Date();
+    const middleDate = new Date(formatDate(date));
+    fromDate.setDate(middleDate.getDate() - 60);
+    const curParams = {
+      ...this.state.searchParams,
+      stockNo: code,
+      country: country,
+      from: fromDate.toISOString().substring(0, 10),
+      to: now.toISOString().substring(0, 10)
+    };
+    console.log(curParams)
+    this.setState({
+      searchParams: curParams
+    })
+
+    ipcRenderer.once('update-query-stock', (event, resp) => {
+      if (resp) {
+        this.setState({
+          data: resp
+        }, () => {
+          window.dispatchEvent(new Event('resize'));
+        })
+      }
+    })
+    ipcRenderer.send('request-get-stock', curParams);
+  }
+  
 
   render() {
 
@@ -150,7 +208,9 @@ class App extends Component {
             stocks={this.state.stockNames}
             searchParams={this.state.searchParams}
             changed={(event) => { this.formChangeHandler(event) }}
-            onQuery={this.searchHandler}>
+            onQuery={this.searchHandler}
+            onFilterAll={this.onFilterAll}
+            >
           </Form>
         </div>
         <div className={classes.flex2}>
@@ -161,6 +221,9 @@ class App extends Component {
           /> */}
           <PlotlyChart data={this.state.data} />
 
+        </div>
+        <div className={classes.flex3}>
+          <StockItems matchedData={this.state.filteredData} clicked={this.filterDataClicked} />
         </div>
       </div>
     );

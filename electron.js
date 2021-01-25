@@ -48,6 +48,9 @@ function connect() {
         case 'reply_getStock':
           mainWindow.webContents.send('update-query-stock', data)
           break;
+          case 'reply_filterAll':
+            mainWindow.webContents.send('reply_filterAll', data)
+            break;
         case 'reply_closed_all':
           app.quit();
           break;
@@ -201,4 +204,7 @@ ipcMain.on('getStockNames', (event) => {
 })
 ipcMain.on('request-get-stock', (event, data) => {
   ws.send(tools.parseCmd('getStock', data));
+})
+ipcMain.on('filterAll', (event, data) => {
+  ws.send(tools.parseCmd('filterAll', data));
 })

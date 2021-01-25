@@ -2,7 +2,7 @@
 # -*- coding: UTF-8 -*-
 
 from __future__ import print_function
-import sys, os
+import sys, os, datetime
 import asyncio
 import traceback
 import websockets
@@ -12,9 +12,9 @@ from models.stocks import StockModel
 import algo
 import numpy as np
 import pandas as pd
-from utility import get_stock_names
+from utility import get_stock_names, getNowString, getDiffDate, filterStock
 
-dbPath = r'C:\tw_stock_test\database'
+DB_PATH = r'C:\tw_stock_test\database'
 
 
 class PyServerAPI(object):
@@ -47,19 +47,37 @@ class PyServerAPI(object):
                 elif cmd == 'isInited':
                     await self.sendMsg(websocket,'reply_init_ok')
                 elif cmd == 'getStockNames':
-                    db_path = os.path.join(dbPath)
-                    ret = get_stock_names(db_path)
+                    ret = get_stock_names(DB_PATH)
                     await self.sendMsg(websocket,'reply_stock_names', ret)
                 elif cmd == 'getStock':
                     countryCode = data['country']
-                    db_path = os.path.join(dbPath,'yahoo', countryCode, f'{countryCode}_'+data['stockNo']+'.db')
+                    db_path = os.path.join(DB_PATH,'yahoo', countryCode, f'{countryCode}_'+data['stockNo']+'.db')
                     stock = StockModel(db_path)
                     recs = stock.get_by_stockNo(fromDate=data['from'], toDate=data['to']) 
                     df = pd.DataFrame(recs)  
-                    # df = algo.strategy(df, avg=int(data['avg']))
                     df = algo.strategy2(df, data)
                     data = df.to_dict(orient='records')
                     await self.sendMsg(websocket,'reply_getStock', data)
+                elif cmd == 'filterAll':
+                    stockNames = get_stock_names(DB_PATH)
+                    filterdData=[]
+                    for stk in stockNames:
+                        try:
+                            item = {'code': stk['code'], 'country': stk['country'], 'name': stk['name'], 'data': []}
+                            countryCode = item['country']
+                            db_path = os.path.join(DB_PATH,'yahoo', countryCode, f'{countryCode}_'+item['code']+'.db')
+                            stock = StockModel(db_path)
+                            recs = stock.get_by_stockNo(fromDate=data['from'], toDate=data['to']) 
+                            df = pd.DataFrame(recs)  
+                            df = algo.strategy2(df, data)
+                            matched, matchedData = filterStock(df,30)
+                            if matched:
+                                item['data'] = matchedData
+                                filterdData.append(item)
+                        except:
+                            err_msg = traceback.format_exc()
+                            print(err_msg)
+                    await self.sendMsg(websocket,'reply_filterAll', filterdData)
                 elif cmd == 'close_all':
                     await self.sendMsg(websocket,'reply_closed_all')
                 else:
@@ -78,7 +96,6 @@ class PyServerAPI(object):
         if cmd not in filter_cmd:
             # self.lg.debug('server sent msg: {}'.format(msg))
             pass
-
         try:
             await websocket.send(json.dumps(msg))
         except Exception as e:
