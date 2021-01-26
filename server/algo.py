@@ -1,7 +1,6 @@
 import numpy as np
 import pandas as pd
 import talib
-from talib import abstract
 from models.stocks import StockModel
 import os
 import matplotlib.pyplot as plt

@@ -1,15 +1,15 @@
-import glob, os, traceback
+import os, traceback
 from os import walk
-import twstock, datetime
+import datetime
 import requests
-from io import StringIO
 import pandas as pd
 import numpy as np
 
 def get_stock_names(dbPath):
     try:
         db_path = os.path.join(dbPath,'yahoo')
-        dfUS = get_us_code()
+        dfTW = get_tw_code_from_csv()
+        dfUS = get_us_code_from_csv()
         stock_names = []
         for root, dirs, files in walk(db_path):
             for f in files:
@@ -20,7 +20,8 @@ def get_stock_names(dbPath):
         for item in stock_names:
             try:
                 if item['country'] == 'tw':
-                    item['name'] = twstock.codes[item['code']].name
+                    twcpy = dfTW.loc[item['code'], ['Company']]
+                    item['name'] = twcpy['Company']
                 elif item['country'] == 'us':
                     uscpy = dfUS.loc[item['code'], ['Company']]
                     item['name'] = uscpy['Company']
@@ -42,6 +43,30 @@ def get_us_code():
 
     # 用 replace 將符號進行替換
     df = df.dropna(axis=1)
+    df = df.set_index('Symbol')
+    return df
+
+def get_us_code_from_csv():
+    df = pd.read_csv('us_list.csv', encoding='utf8')
+    # 用 replace 將符號進行替換
+    df = df.dropna(axis=1)
+    df = df.set_index('Symbol')
+    df = df.rename(columns={'Name': 'Company'})
+    return df
+
+def get_code_for_tw(text):
+    return text.split('　')[0]
+
+def get_name_for_tw(text):
+    return text.split('　')[1]
+
+def get_tw_code_from_csv():
+    df = pd.read_csv('tw_list.csv', encoding='utf8')
+    # 用 replace 將符號進行替換
+    df = df.dropna(axis=1)
+    df['Symbol'] = df['Symbol'].apply(lambda x: x.encode().decode('utf-8').strip())
+    df['Company'] = df['Company'].apply(lambda x: x.encode().decode('utf-8').strip())
+    df = df.rename(columns={'Name': 'Company'})
     df = df.set_index('Symbol')
     return df
 
@@ -87,16 +112,9 @@ def filterStock(df, withdays=5):
     return matched, data
 
 if __name__ == '__main__':
-    # dbPath = r'C:\tw_stock_test\database'
-    # db_path = os.path.join(dbPath)
-    # ret = get_stock_names(db_path)
+    dbPath = r'C:\tw_stock_test\database'
+    db_path = os.path.join(dbPath)
+    ret = get_stock_names(db_path)
     # print(ret)
-    ret = getNowString()
+    # ret = get_tw_code_from_csv()
     print(ret)
-    print(type(ret))
-    ret = getNowString('2019-01-31')
-    print(ret)
-    print(type(ret))
-    ret = getDiffDate(-5)
-    print(ret)
-    print(type(ret))

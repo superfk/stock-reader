@@ -34,6 +34,20 @@
           "filter": [
             "**/*"
           ]
+        },
+        {
+          "from": "tw_list.csv",
+          "to": "tw_list.csv",
+          "filter": [
+            "**/*"
+          ]
+        },
+        {
+          "from": "us_list.csv",
+          "to": "us_list.csv",
+          "filter": [
+            "**/*"
+          ]
         }
       ],
       "requestedExecutionLevel": "requireAdministrator",

@@ -47,6 +47,7 @@ class App extends Component {
 
   componentDidMount() {
     const onGetStockNames = (event, data) => {
+      console.log(data)
       this.setState({
         stockNames: data
       })
