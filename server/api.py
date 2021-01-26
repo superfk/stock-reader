@@ -2,7 +2,7 @@
 # -*- coding: UTF-8 -*-
 
 from __future__ import print_function
-import sys, os, datetime
+import sys, os, datetime, time
 import asyncio
 import traceback
 import websockets
@@ -12,6 +12,7 @@ from models.stocks import StockModel
 import algo
 import numpy as np
 import pandas as pd
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from utility import get_stock_names, getNowString, getDiffDate, filterStock
 
 DB_PATH = r'C:\tw_stock_test\database'
@@ -60,8 +61,7 @@ class PyServerAPI(object):
                     await self.sendMsg(websocket,'reply_getStock', data)
                 elif cmd == 'filterAll':
                     stockNames = get_stock_names(DB_PATH)
-                    filterdData=[]
-                    for stk in stockNames:
+                    def run_instance(stk):
                         try:
                             item = {'code': stk['code'], 'country': stk['country'], 'name': stk['name'], 'data': []}
                             countryCode = item['country']
@@ -73,10 +73,34 @@ class PyServerAPI(object):
                             matched, matchedData = filterStock(df,30)
                             if matched:
                                 item['data'] = matchedData
-                                filterdData.append(item)
+                                return True , item
+                            else:
+                                return False, None
                         except:
                             err_msg = traceback.format_exc()
                             print(err_msg)
+                            return False , None
+                    startT = time.time()
+                    workers = 20
+                    filterdData=[]
+                    with ThreadPoolExecutor(max_workers=workers) as executor:
+                        futures = []
+                        for s in stockNames:
+                            future = executor.submit(run_instance, s)
+                            print(type(future))
+                            futures.append(future)
+                        totalStocks = len(futures)
+                        success_tasks = 0
+                        for future in as_completed(futures):
+                            success, item = future.result()
+                            if success:
+                                success_tasks += 1
+                                filterdData.append(item)
+                            else:
+                                pass
+                    endT = time.time()
+                    exeT = endT - startT
+                    print(f"executed time: {exeT} s for {workers} workers, successTasks {success_tasks}/{totalStocks}")
                     await self.sendMsg(websocket,'reply_filterAll', filterdData)
                 elif cmd == 'close_all':
                     await self.sendMsg(websocket,'reply_closed_all')
