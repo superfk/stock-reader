@@ -6,10 +6,13 @@ const { ipcMain, dialog, shell } = require('electron')
 const appRoot = require('electron-root-path').rootPath;
 const ProgressBar = require('electron-progressbar');
 const isDev = require('electron-is-dev');
+const taskkill = require('taskkill');
+const find = require('find-process');
 const appPath = isDev ? path.resolve(appRoot, './public') : appRoot;
 let tools = require(isDev ? path.join(appRoot, 'public', 'assets/shared_tools.js') : './assets/shared_tools.js')
 let ws;
 let mainWindow = null;
+let isSecondIndtance = false;
 
 
 const curPath = path.join(appRoot, 'config.json')
@@ -150,9 +153,40 @@ const createPyProc = () => {
 }
 
 const exitPyProc = () => {
-  pyProc.kill();
-  pyProc = null;
-  pyPort = null;
+  e.preventDefault()
+  if (!isSecondIndtance) {
+    find('name', 'api.exe', true)
+      .then(function (list) {
+        console.log('there are %s api.exe process(es)', list.length);
+        const apiPids = list.map(elm => elm.pid)
+        console.log('api.exe pid:', apiPids);
+        try {
+          (async () => {
+            try {
+              await taskkill(apiPids, { force: true, tree: true });
+              ws.close();
+              ws = null;
+              app.exit(0);
+            } catch (e) {
+              app.exit(0);
+            }
+          })();
+
+        } catch (err) {
+          app.exit(0)
+        }
+      });
+  } else {
+    try {
+      ws.close();
+      ws = null;
+      app.exit(0);
+    } catch (e) {
+      app.exit(0);
+    }
+
+    ipcMain.removeAllListeners();
+  }
 }
 
 // init config and database
