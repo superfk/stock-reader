@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import classes from './Form.module.css'
+import CircularProgress from '@material-ui/core/CircularProgress';
+import classes from './Form.module.css';
 
 const Form = props => {
 
@@ -17,7 +18,7 @@ const Form = props => {
             <div>
                 <label >Stock:</label>
                 {/* <input type='text' name='stockNo' value={props.searchParams.stockNo} onChange={props.changed} ></input> */}
-                <select name='stockNo' value={props.searchParams.stockNo} onChange={props.changed}>
+                <select name='stockNo' value={props.searchParams.stockNo} onChange={props.changed} style={{maxWidth: 200}}>
                     {options}
                 </select>
                 <label >Average:</label>
@@ -43,9 +44,11 @@ const Form = props => {
                 <button onClick={props.onQuery}>OK</button>
             </div>
         </form>
-
-        <div>
-            <button onClick={props.onFilterAll}>篩選所有符合股票</button>
+        <div style={{display: 'flex', flexDirection:'column', justifyContent:'space-between', alignItems:'center', height: 150, marginBottom: 10}}>
+            <div><button onClick={props.onUpdateAll}>更新股票歷史資料</button></div>
+            <div><button onClick={props.onFilterAll}>篩選所有符合股票</button></div>            
+            <div>{props.isLoading ? <CircularProgress /> : null }</div>
+            <div>{props.updateMsg}</div>
         </div>
     </div>
 }

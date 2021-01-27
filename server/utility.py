@@ -12,10 +12,12 @@ def get_stock_names(dbPath):
         dfUS = get_us_code_from_csv()
         stock_names = []
         for root, dirs, files in walk(db_path):
-            for f in files:
-                country, code = tuple(f.split('.')[0].split('_'))
-                item = {'code': code, 'country': country}
-                stock_names.append(item)
+            if len(dirs) == 0:
+                for f in files:
+                    country = os.path.split(root)[1]
+                    code = f.split('.')[0]
+                    item = {'code': code, 'country': country}
+                    stock_names.append(item)
                 
         for item in stock_names:
             try:

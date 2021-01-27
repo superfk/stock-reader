@@ -41,21 +41,29 @@ class App extends Component {
     stockData: { data: [{ time: '', value: '' }], title: 'stock' },
     data: [],
     filteredData: [],
-    stockNames: [] // [{'code': code, 'country': country, 'name': name}]
+    stockNames: [], // [{'code': code, 'country': country, 'name': name}]
+    isLoading: false,
+    updateMsg: '',
 
   };
 
   componentDidMount() {
     const onGetStockNames = (event, data) => {
-      console.log(data)
       this.setState({
         stockNames: data
       })
     }
+    const onUpdateMsg = (event, data) => {
+      this.setState({
+        updateMsg: data,
+      })
+    }
     ipcRenderer.on('reply_stock_names', onGetStockNames)
+    ipcRenderer.on('reply_updateAllRealTime', onUpdateMsg)
     ipcRenderer.send('getStockNames');
     return () => {
       ipcRenderer.removeListener('reply_stock_names', onGetStockNames)
+      ipcRenderer.removeListener('reply_updateAllRealTime', onUpdateMsg)
     }
   }
 
@@ -161,20 +169,38 @@ class App extends Component {
     }
     ipcRenderer.once('reply_filterAll', (event, resp) => {
       if (resp) {
-        console.log(resp)
         this.setState({
-          filteredData: resp
+          filteredData: resp,
+          isLoading: false
         }, () => {
         })
       }
     })
-    ipcRenderer.send('filterAll', this.state.searchParams);
+    this.setState({isLoading: true},()=>{
+      ipcRenderer.send('filterAll', this.state.searchParams);
+    })
+  }
+
+  onUpdateAll = (event) => {
+    try {
+      event.preventDefault();
+    } catch (err) {
+
+    }
+    ipcRenderer.once('reply_updateAll', (event, resp) => {
+      this.setState({
+        isLoading: false,
+      })
+    })
+    this.setState({isLoading: true},()=>{
+      ipcRenderer.send('updateAll');
+    })
   }
   filterDataClicked = (code, date, country) => {
     const now = new Date();
     const fromDate = new Date();
     const middleDate = new Date(formatDate(date));
-    fromDate.setDate(middleDate.getDate() - 60);
+    fromDate.setDate(middleDate.getDate() - 360);
     const curParams = {
       ...this.state.searchParams,
       stockNo: code,
@@ -210,6 +236,9 @@ class App extends Component {
             changed={(event) => { this.formChangeHandler(event) }}
             onQuery={this.searchHandler}
             onFilterAll={this.onFilterAll}
+            onUpdateAll={this.onUpdateAll}
+            isLoading={this.state.isLoading}
+            updateMsg={this.state.updateMsg}
             >
           </Form>
         </div>

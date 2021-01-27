@@ -10,4 +10,4 @@ loguru
 matplotlib
 ./TA_Lib-0.4.19-cp38-cp38-win_amd64.whl
 requests
-twstock
+pandas_datareader

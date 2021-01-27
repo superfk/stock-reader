@@ -11,6 +11,11 @@ let tools = require(isDev ? path.join(appRoot, 'public', 'assets/shared_tools.js
 let ws;
 let mainWindow = null;
 
+
+const curPath = path.join(appRoot, 'config.json')
+console.log('appRoot Path:', appRoot)
+console.log('config Path:', curPath)
+
 function connect() {
   try {
     const WebSocket = require('ws');
@@ -48,9 +53,15 @@ function connect() {
         case 'reply_getStock':
           mainWindow.webContents.send('update-query-stock', data)
           break;
-          case 'reply_filterAll':
-            mainWindow.webContents.send('reply_filterAll', data)
-            break;
+        case 'reply_filterAll':
+          mainWindow.webContents.send('reply_filterAll', data)
+          break;
+        case 'reply_updateAll':
+          mainWindow.webContents.send('reply_updateAll', data)
+          break;
+        case 'reply_updateAllRealTime':
+          mainWindow.webContents.send('reply_updateAllRealTime', data)
+          break;
         case 'reply_closed_all':
           app.quit();
           break;
@@ -146,7 +157,8 @@ const exitPyProc = () => {
 
 // init config and database
 var init_server = function () {
-  ws.send(tools.parseCmd('isInited'));
+  ws.send(tools.parseCmd('isInited', appRoot));
+  ws.send(tools.parseCmd('load_sys_config', curPath));
 }
 
 
@@ -207,4 +219,7 @@ ipcMain.on('request-get-stock', (event, data) => {
 })
 ipcMain.on('filterAll', (event, data) => {
   ws.send(tools.parseCmd('filterAll', data));
+})
+ipcMain.on('updateAll', (event) => {
+  ws.send(tools.parseCmd('updateAll'));
 })

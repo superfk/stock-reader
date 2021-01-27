@@ -289,7 +289,7 @@ const PlotlyChart = props => {
                         autorange: true,
                         type: 'linear',
                         title: 'close',
-                        domain: [0.4, 1]
+                        domain: [0.3, 1]
                     },
                     yaxis2: {
                         title: 'KD',
@@ -297,13 +297,13 @@ const PlotlyChart = props => {
                         tickfont: { color: 'rgb(148, 103, 189)' },
                         overlaying: 'y',
                         side: 'right',
-                        domain: [0.4, 1],
+                        domain: [0.3, 1],
                         anchor: 'x',
                         position: 0.9
                     },
                     yaxis3: {
                         title: 'Volume',
-                        domain: [0, 0.3]
+                        domain: [0, 0.2]
                     },
                     yaxis4: {
                         title: 'Weekly Slope',
@@ -311,7 +311,7 @@ const PlotlyChart = props => {
                         tickfont: { color: 'rgb(148, 103, 189)' },
                         overlaying: 'y',
                         side: 'right',
-                        domain: [0.4, 1],
+                        domain: [0.3, 1],
                         anchor: 'free',
                         position: 1
                     },
