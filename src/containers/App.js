@@ -29,7 +29,7 @@ class App extends Component {
     searchParams: {
       stockNo: '2317',
       avg: '5',
-      kd: '30',
+      kd: '20',
       slope: '5',
       slope_baseline: '0',
       rsi: '35',
@@ -200,7 +200,7 @@ class App extends Component {
     const now = new Date();
     const fromDate = new Date();
     const middleDate = new Date(formatDate(date));
-    fromDate.setDate(middleDate.getDate() - 360);
+    fromDate.setDate(middleDate.getDate() - 730);
     const curParams = {
       ...this.state.searchParams,
       stockNo: code,
