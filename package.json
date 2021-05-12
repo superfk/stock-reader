@@ -84,7 +84,7 @@
   },
   "dependencies": {
     "@material-ui/core": "^4.11.3",
-    "chart.js": "^2.9.3",
+    "chart.js": "^2.9.4",
     "cross-env": "^6.0.3",
     "electron-is-dev": "^1.1.0",
     "electron-progressbar": "^1.2.0",
